@@ -1,8 +1,12 @@
 # TATAHome for Home Assistant
 
-Custom integration for **TATAHome / Haier 200S** robot vacuums. It talks to the
-same vendor cloud as the TATAHome Android app; no Android emulator and no local
-MQTT bridge are required.
+Custom integration for **TATAHome / Haier 200S** robot vacuums. It prefers a
+**direct LAN TCP connection** to the robot, and falls back to the vendor cloud
+when the robot is not reachable on the local network.
+
+The robot's LAN endpoint is discovered through the vendor cloud (`0x100B`),
+then all status, commands and settings use the robot's local TCP port (normally
+`8111`) with the same RN envelope. No MQTT broker is involved.
 
 The integration was rebuilt for **Home Assistant Core 2026.11** using the
 current integration rules: config flow, `DataUpdateCoordinator`, `runtime_data`,
@@ -56,6 +60,29 @@ voice and volume.
   firmware)
 - Automatic TCP heartbeat every 120 s, configurable in options
 - Automatic re-authentication when the cloud session expires
+
+## Local connection
+
+The APK does **not** contain MQTT (no Paho/Mosquitto, no 1883/8883/topic
+strings). Its native `libNetworkJni.so` uses a custom `RNTcpClient` protocol.
+
+The app can obtain the robot's LAN address with cloud opcode `0x100B`:
+
+```text
+ip=192.168.11.53 port=8111 ssid=ASUS mask=255.255.255.0
+```
+
+Port `8111` accepts the same 24-byte RN envelope without a login/session step.
+The integration therefore:
+
+1. logs in to the cloud once to discover the robot's LAN IP/port;
+2. connects directly to `IP:8111`;
+3. uses local TCP for polling, commands, consumables and settings;
+4. reconnects locally after a socket drop, and only falls back to the cloud if
+   the LAN endpoint is unavailable.
+
+Local mode still uses cloud credentials for the initial LAN discovery. If the
+robot's IP changes, restart the integration; it will rediscover it.
 
 ## Removed intentionally
 
@@ -127,7 +154,10 @@ data:
 
 ## Known limitations
 
-- Cloud-only; no local control.
+- LAN discovery still needs the vendor cloud once; a fully offline/manual IP
+  option is not implemented yet.
+- The robot's LAN IP can change after DHCP lease changes; restart the
+  integration to rediscover it.
 - The vendor's map binary is only complete after a finished clean. The map is
   not exposed as a HA camera yet; the cloud task lookup exists but incomplete
   maps are rejected.

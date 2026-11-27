@@ -86,6 +86,7 @@ class TATAHomeVacuum(TATAHomeEntity, StateVacuumEntity):
                 "cleaning_mode": self._device.get("mode"),
                 "map_available": self._device.get("mapAvailable"),
                 "error": self._device.get("error"),
+                "connection": "local" if self.coordinator.is_local else "cloud",
             }
         )
         return attrs

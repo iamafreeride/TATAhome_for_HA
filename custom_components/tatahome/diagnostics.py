@@ -22,6 +22,10 @@ async def async_get_config_entry_diagnostics(
         "entry": async_redact_data(dict(entry.data), REDACT),
         "options": dict(entry.options),
         "uid": data.cloud.uid,
+        "connection": "local" if data.is_local else "cloud",
+        "local_endpoint": (
+            f"{data.local_host}:{data.local_port}" if data.is_local else None
+        ),
         "devices": [
             {
                 "devid": device.devid,

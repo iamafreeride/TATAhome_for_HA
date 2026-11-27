@@ -32,6 +32,12 @@ class TATAHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         cloud: CloudSession,
         store: TATAHomeSettingsStore,
         update_interval: int,
+        *,
+        is_local: bool = False,
+        local_host: str | None = None,
+        local_port: int | None = None,
+        uid: int = 0,
+        device: Any = None,
     ) -> None:
         super().__init__(
             hass,
@@ -43,6 +49,40 @@ class TATAHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.cloud = cloud
         self.store = store
         self.active_mode: str | None = None
+        self.is_local = is_local
+        self.local_host = local_host
+        self.local_port = local_port
+        self.uid = uid
+        self.device = device
+
+    async def _async_relogin(self) -> None:
+        """Reconnect locally when possible, otherwise fall back to cloud."""
+        if self.is_local and self.local_host and self.local_port and self.device:
+            try:
+                await self.hass.async_add_executor_job(
+                    self.cloud.connect_local,
+                    self.local_host,
+                    self.local_port,
+                    self.uid,
+                    self.device,
+                )
+            except CloudError as err:
+                _LOGGER.warning("TATAHome local reconnect failed: %s", err)
+                self.is_local = False
+            else:
+                _LOGGER.info("TATAHome local TCP reconnected")
+                await self.async_apply_saved_settings()
+                return
+
+        _LOGGER.warning("TATAHome session lost; re-authenticating with cloud")
+        result = await self.hass.async_add_executor_job(
+            self.cloud.login,
+            self.config_entry.data[CONF_EMAIL],
+            self.config_entry.data[CONF_PASSWORD],
+        )
+        if not result.ok:
+            raise ConfigEntryAuthFailed(result.errstr or "TATAHome login rejected")
+        await self.async_apply_saved_settings()
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
@@ -60,18 +100,6 @@ class TATAHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return data
         except CloudError as err:
             raise UpdateFailed(f"TATAHome update failed: {err}") from err
-
-    async def _async_relogin(self) -> None:
-        """Re-authenticate, then restore the user's saved settings."""
-        _LOGGER.warning("TATAHome session lost; re-authenticating")
-        result = await self.hass.async_add_executor_job(
-            self.cloud.login,
-            self.config_entry.data[CONF_EMAIL],
-            self.config_entry.data[CONF_PASSWORD],
-        )
-        if not result.ok:
-            raise ConfigEntryAuthFailed(result.errstr or "TATAHome login rejected")
-        await self.async_apply_saved_settings()
 
     async def async_apply_saved_settings(self) -> None:
         """Write persisted desired values back after a fresh login."""

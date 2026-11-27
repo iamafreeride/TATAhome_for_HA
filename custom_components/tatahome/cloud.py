@@ -51,6 +51,9 @@ OP_DEVICE_SETTINGS_REQ = 0x1459
 OP_QUIET_GET_REQ = 0x146B
 OP_QUIET_SET_REQ = 0x146D
 
+CLOUD_HOST = "fas.haier.3irobotix.net"
+CLOUD_PORT = 4020
+
 
 class CloudError(Exception):
     pass
@@ -81,7 +84,7 @@ class CloudDevice:
 
 
 class CloudSession:
-    def __init__(self, host: str = "fas.haier.3irobotix.net", port: int = 4020, timeout: float = 10.0,
+    def __init__(self, host: str = CLOUD_HOST, port: int = CLOUD_PORT, timeout: float = 10.0,
                  heartbeat_seconds: int = 120) -> None:
         self.host = host
         self.port = port
@@ -90,6 +93,7 @@ class CloudSession:
         self.uid = 0
         self.sessionid = ""
         self.email = ""
+        self.local_mode = False
         self.devices: list[CloudDevice] = []
         self._lock = threading.RLock()
         self._last_status: dict[int, dict[str, Any]] = {}
@@ -147,6 +151,9 @@ class CloudSession:
     # ------------------------------------------------------------------ login
     def login(self, email: str, password: str) -> CloudLoginResult:
         self.close()
+        self.local_mode = False
+        self.host = CLOUD_HOST
+        self.port = CLOUD_PORT
         try:
             sock = socket.create_connection((self.host, self.port), timeout=self.timeout)
             sock.settimeout(self.timeout)
@@ -194,6 +201,51 @@ class CloudSession:
             dft_devid=int(attrs.get("dftDevid", 0)),
             raw=pkt.payload,
         )
+
+    def get_wlan_info(self) -> dict[str, Any]:
+        """Ask the cloud for the robot's LAN address (opcode 0x100B)."""
+        if not self.sock:
+            raise CloudError("Not connected to TATAHome cloud")
+        device = self.select(None)
+        pkt = self._request(0x100B, b"", self.uid, device.devid)
+        outer = _parse_fields(self._unpack(pkt.payload))
+        if _as_int(outer.get(1, [0])[-1]) != 0:
+            raise CloudError(_as_text(outer.get(2, [b"WLAN info unavailable"])[-1]))
+        attrs = _parse_fields(outer[3][-1])
+        return {
+            "ip": _as_text(attrs.get(1, [b""])[-1]),
+            "ssid": _as_text(attrs.get(2, [b""])[-1]),
+            "port": _as_int(attrs.get(3, [0])[-1]),
+            "mask": _as_text(attrs.get(4, [b""])[-1]),
+            "mac": _as_text(attrs.get(5, [b""])[-1]),
+        }
+
+    def connect_local(self, host: str, port: int, uid: int, device: CloudDevice) -> None:
+        """Connect directly to the robot's LAN TCP server.
+
+        The local server speaks the same 24-byte RN envelope, but there is no
+        login/sessionid step; cid=uid, did=devid is enough.
+        """
+        self.close()
+        sock = socket.create_connection((host, port), timeout=self.timeout)
+        sock.settimeout(self.timeout)
+        self.host = host
+        self.port = port
+        self.sock = sock
+        self.uid = int(uid)
+        self.sessionid = ""
+        self.local_mode = True
+        self.devices = [
+            CloudDevice(
+                devid=device.devid,
+                serial=device.serial,
+                alias=device.alias,
+                firmware=device.firmware,
+                online=True,
+            )
+        ]
+        self._last_status.clear()
+        self.start_heartbeat()
 
     def start_heartbeat(self) -> None:
         """Keep the vendor TCP session warm without flooding the server."""
@@ -627,12 +679,16 @@ class CloudSession:
         cached = self._quiet_cache.get(device.devid)
         if cached and time.time() - cached[0] < 300:
             return cached[1]
+        if self.local_mode:
+            # The local firmware does not answer the cloud quiet-hours read;
+            # use the value written through HA (or a neutral default).
+            return {"enabled": False, "start": "22:00", "end": "07:00"}
         payload = _field_str(1, self.sessionid) + _field_uint(2, device.devid)
         try:
             pkt = self._request(OP_QUIET_GET_REQ, payload, self.uid, device.devid)
             outer = _parse_fields(self._unpack(pkt.payload))
             inner = _parse_fields(outer[3][-1])
-        except (CloudError, ProtocolError, KeyError, IndexError):
+        except (CloudError, ProtocolError, KeyError, IndexError, TypeError):
             return {"enabled": False, "start": "22:00", "end": "07:00"}
         begin = _as_int(inner.get(2, [1320])[-1])
         end = _as_int(inner.get(3, [420])[-1])
