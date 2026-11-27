@@ -132,6 +132,11 @@ data:
   not exposed as a HA camera yet; the cloud task lookup exists but incomplete
   maps are rejected.
 - The vendor has no distinct stop command; stop maps to pause.
+- Clean-mode switches track the mode started from Home Assistant. The cloud
+  status does not expose the current clean type, so a mode started from the
+  vendor app may not be reflected until the next HA command/restart.
+- Settings are re-applied from `.storage` after a new login; if the robot has
+  been reset/changed from the vendor app, the saved HA values win.
 - Session is bound to one TCP connection; the integration owns it and keeps it
   warm with a heartbeat.
 - Only tested with Haier 200S firmware `H2.3.5.32.28R`.
