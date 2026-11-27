@@ -15,8 +15,9 @@ Wire facts verified against the real account and server:
 
 from __future__ import annotations
 
-import socket
+import contextlib
 import gzip
+import socket
 import threading
 import time
 import zlib
@@ -24,10 +25,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from .protocol import (
-    CloudLoginResult,
     DEFAULT_MFRS_ID,
     OP_USER_LOGIN_REQ,
     OP_USER_LOGIN_RSP,
+    CloudLoginResult,
     Packet,
     ProtocolError,
     _as_int,
@@ -222,7 +223,7 @@ class CloudSession:
         payload = _field_uint(1, self.uid) + _field_str(2, self.sessionid) + _field_uint(3, 0)
         last_error: Exception | None = None
         outer: dict[int, list[Any]] = {}
-        for attempt in range(3):
+        for _attempt in range(3):
             try:
                 pkt = self._send(self.sock, OP_DEVICE_LIST_REQ, payload, 0, 0, 0)
                 outer = _parse_fields(self._unpack(pkt.payload))
@@ -717,8 +718,6 @@ class CloudSession:
         self._heartbeat_stop.set()
         with self._lock:
             if self.sock:
-                try:
+                with contextlib.suppress(OSError):
                     self.sock.close()
-                except OSError:
-                    pass
             self.sock = None

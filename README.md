@@ -8,6 +8,15 @@ The integration was rebuilt for **Home Assistant Core 2026.11** using the
 current integration rules: config flow, `DataUpdateCoordinator`, `runtime_data`,
 device registry, entity translations, diagnostics and a quality-scale manifest.
 
+Reference material used:
+
+- [Integration manifest](https://contributors.home-assistant.io/core/integrations/manifest/)
+- [Config flow](https://contributors.home-assistant.io/core/integrations/config-flow/)
+- [Fetching data / coordinator](https://contributors.home-assistant.io/core/integrations/fetching-data/)
+- [Vacuum entity](https://contributors.home-assistant.io/core/entities/vacuum/)
+- [Translations](https://contributors.home-assistant.io/core/integrations/translations/)
+- [Integration quality scale](https://contributors.home-assistant.io/core/quality-scale/)
+
 ## Features
 
 ### Vacuum

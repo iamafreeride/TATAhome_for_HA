@@ -18,7 +18,6 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_HEARTBEAT,
     DEFAULT_SCAN_INTERVAL,
-    DOMAIN,
     PLATFORMS,
 )
 from .coordinator import TATAHomeCoordinator
