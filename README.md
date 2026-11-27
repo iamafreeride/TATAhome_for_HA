@@ -112,6 +112,7 @@ data:
   `switch.*_breakpoint_resume`, `switch.*_carpet_turbo`, `switch.*_voice`
 - `select.*_suction`, `select.*_water`, `select.*_mode`
 - `number.*_voice_volume`
+- `time.*_do_not_disturb_start`, `time.*_do_not_disturb_end`
 - `button.*_edge_clean`, `button.*_spot_clean`, `button.*_mop_clean`,
   `button.*_area_clean`, `button.*_two_pass_clean`
 

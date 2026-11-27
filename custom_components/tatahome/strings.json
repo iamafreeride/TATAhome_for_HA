@@ -93,6 +93,10 @@
     "number": {
       "volume": {"name": "Voice volume"}
     },
+    "time": {
+      "quiet_start": {"name": "Do not disturb start"},
+      "quiet_end": {"name": "Do not disturb end"}
+    },
     "button": {
       "edge_clean": {"name": "Edge clean"},
       "spot_clean": {"name": "Spot clean"},

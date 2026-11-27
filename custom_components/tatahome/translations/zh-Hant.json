@@ -93,6 +93,10 @@
     "number": {
       "volume": {"name": "語音音量"}
     },
+    "time": {
+      "quiet_start": {"name": "勿擾開始"},
+      "quiet_end": {"name": "勿擾結束"}
+    },
     "button": {
       "edge_clean": {"name": "沿邊清掃"},
       "spot_clean": {"name": "定點清掃"},

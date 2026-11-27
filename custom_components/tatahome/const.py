@@ -26,6 +26,7 @@ PLATFORMS: Final = [
     "switch",
     "select",
     "number",
+    "time",
     "button",
 ]
 
