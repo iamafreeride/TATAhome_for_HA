@@ -62,10 +62,10 @@
       "battery": {"name": "電量"},
       "clean_area": {"name": "清掃面積"},
       "clean_time": {"name": "清掃時間"},
-      "main_brush": {"name": "主刷剩餘"},
-      "side_brush": {"name": "邊刷剩餘"},
-      "filter": {"name": "濾網剩餘"},
-      "mop_pad": {"name": "抹布剩餘"},
+      "main_brush": {"name": "主刷壽命"},
+      "side_brush": {"name": "邊刷壽命"},
+      "filter": {"name": "濾網壽命"},
+      "mop_pad": {"name": "抹布壽命"},
       "firmware": {"name": "韌體"}
     },
     "binary_sensor": {
@@ -77,7 +77,11 @@
       "history_map": {"name": "記憶地圖"},
       "breakpoint_resume": {"name": "斷點續掃"},
       "carpet_turbo": {"name": "地毯增壓"},
-      "voice": {"name": "語音提示"}
+      "voice": {"name": "語音提示"},
+      "edge_clean": {"name": "沿邊清掃"},
+      "spot_clean": {"name": "定點清掃"},
+      "area_clean": {"name": "劃區清掃"},
+      "two_pass_clean": {"name": "兩次清掃"}
     },
     "select": {
       "suction": {"name": "吸力", "state": {
@@ -96,13 +100,6 @@
     "time": {
       "quiet_start": {"name": "勿擾開始"},
       "quiet_end": {"name": "勿擾結束"}
-    },
-    "button": {
-      "edge_clean": {"name": "沿邊清掃"},
-      "spot_clean": {"name": "定點清掃"},
-      "mop_clean": {"name": "拖地模式"},
-      "area_clean": {"name": "劃區清掃"},
-      "two_pass_clean": {"name": "兩次清掃"}
     }
   }
 }

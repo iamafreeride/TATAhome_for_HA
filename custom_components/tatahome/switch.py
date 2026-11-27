@@ -51,6 +51,39 @@ SWITCHES: tuple[TATAHomeSwitchDescription, ...] = (
 )
 
 
+@dataclass(frozen=True, kw_only=True)
+class TATAHomeCleanSwitchDescription(SwitchEntityDescription):
+    action: str
+
+
+CLEAN_SWITCHES: tuple[TATAHomeCleanSwitchDescription, ...] = (
+    TATAHomeCleanSwitchDescription(
+        key="edge_clean",
+        translation_key="edge_clean",
+        action="edge",
+        icon="mdi:border-outside",
+    ),
+    TATAHomeCleanSwitchDescription(
+        key="spot_clean",
+        translation_key="spot_clean",
+        action="spot",
+        icon="mdi:crosshairs",
+    ),
+    TATAHomeCleanSwitchDescription(
+        key="area_clean",
+        translation_key="area_clean",
+        action="area",
+        icon="mdi:selection",
+    ),
+    TATAHomeCleanSwitchDescription(
+        key="two_pass_clean",
+        translation_key="two_pass_clean",
+        action="two_pass",
+        icon="mdi:repeat",
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: TATAHomeConfigEntry,
@@ -60,6 +93,10 @@ async def async_setup_entry(
     coordinator = entry.runtime_data.coordinator
     async_add_entities(
         [TATAHomeSwitch(coordinator, description) for description in SWITCHES]
+        + [
+            TATAHomeCleanModeSwitch(coordinator, description)
+            for description in CLEAN_SWITCHES
+        ]
     )
 
 
@@ -107,3 +144,33 @@ class TATAHomeSwitch(TATAHomeEntity, SwitchEntity):
             )
             return
         await self.coordinator.async_set(self.entity_description.setting_key, "0")
+
+
+class TATAHomeCleanModeSwitch(TATAHomeEntity, SwitchEntity):
+    """A clean mode exposed as a switch.
+
+    On starts the mode and off pauses the robot.  The vendor status does not
+    expose the current clean type, so the active mode is tracked by the
+    coordinator for this HA session.
+    """
+
+    entity_description: TATAHomeCleanSwitchDescription
+
+    def __init__(
+        self, coordinator, description: TATAHomeCleanSwitchDescription
+    ) -> None:
+        super().__init__(coordinator, f"switch_{description.key}")
+        self.entity_description = description
+
+    @property
+    def is_on(self) -> bool:
+        return (
+            self.coordinator.active_mode == self.entity_description.action
+            and str(self._device.get("state", "")).lower() == "cleaning"
+        )
+
+    async def async_turn_on(self, **kwargs) -> None:
+        await self.coordinator.async_send(self.entity_description.action)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        await self.coordinator.async_send("pause")

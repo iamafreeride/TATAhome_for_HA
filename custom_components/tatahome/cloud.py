@@ -261,6 +261,9 @@ class CloudSession:
                 raise CloudError("Not connected to TATAHome cloud")
             try:
                 return self._send(self.sock, opcode, payload, cid, did, 0)
+            except CloudError:
+                self.close()
+                raise
             except (OSError, ProtocolError) as exc:
                 self.close()
                 raise CloudError(str(exc)) from exc

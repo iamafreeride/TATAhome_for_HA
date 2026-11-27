@@ -19,7 +19,11 @@
       "history_map": {"default": "mdi:map-marker-path"},
       "breakpoint_resume": {"default": "mdi:restart"},
       "carpet_turbo": {"default": "mdi:rug"},
-      "voice": {"default": "mdi:volume-high"}
+      "voice": {"default": "mdi:volume-high"},
+      "edge_clean": {"default": "mdi:border-outside"},
+      "spot_clean": {"default": "mdi:crosshairs"},
+      "area_clean": {"default": "mdi:selection"},
+      "two_pass_clean": {"default": "mdi:repeat"}
     },
     "select": {
       "suction": {"default": "mdi:fan"},
@@ -28,13 +32,6 @@
     },
     "number": {
       "volume": {"default": "mdi:volume-high"}
-    },
-    "button": {
-      "edge_clean": {"default": "mdi:border-outside"},
-      "spot_clean": {"default": "mdi:crosshairs"},
-      "mop_clean": {"default": "mdi:water"},
-      "area_clean": {"default": "mdi:selection"},
-      "two_pass_clean": {"default": "mdi:repeat"}
     }
   }
 }

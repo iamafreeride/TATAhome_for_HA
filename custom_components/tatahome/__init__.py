@@ -22,6 +22,7 @@ from .const import (
 )
 from .coordinator import TATAHomeCoordinator
 from .services import async_setup_services
+from .storage import TATAHomeSettingsStore
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ class TATAHomeRuntimeData:
 
     cloud: CloudSession
     coordinator: TATAHomeCoordinator
+    store: TATAHomeSettingsStore
 
 
 type TATAHomeConfigEntry = ConfigEntry[TATAHomeRuntimeData]
@@ -45,6 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TATAHomeConfigEntry) -> 
     heartbeat = int(entry.options.get(CONF_HEARTBEAT, DEFAULT_HEARTBEAT))
 
     cloud = CloudSession(heartbeat_seconds=heartbeat)
+    store = TATAHomeSettingsStore(hass, entry.entry_id)
     try:
         result = await hass.async_add_executor_job(cloud.login, email, password)
     except CloudError as err:
@@ -61,11 +64,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: TATAHomeConfigEntry) -> 
         hass,
         entry,
         cloud,
+        store,
         update_interval=scan_interval,
     )
+    await coordinator.async_apply_saved_settings()
     await coordinator.async_config_entry_first_refresh()
 
-    entry.runtime_data = TATAHomeRuntimeData(cloud=cloud, coordinator=coordinator)
+    entry.runtime_data = TATAHomeRuntimeData(
+        cloud=cloud, coordinator=coordinator, store=store
+    )
     await async_setup_services(hass)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

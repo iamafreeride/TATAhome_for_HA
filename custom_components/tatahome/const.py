@@ -27,7 +27,6 @@ PLATFORMS: Final = [
     "select",
     "number",
     "time",
-    "button",
 ]
 
 UPDATE_INTERVAL: Final = timedelta(seconds=DEFAULT_SCAN_INTERVAL)

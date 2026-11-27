@@ -14,7 +14,7 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(data["domain"], "tatahome")
         self.assertTrue(data["config_flow"])
         self.assertEqual(data["iot_class"], "cloud_polling")
-        self.assertEqual(data["version"], "0.1.0")
+        self.assertEqual(data["version"], "0.2.0")
 
     def test_translations_are_valid(self) -> None:
         for name in ("strings.json", "translations/en.json", "translations/zh-Hant.json"):
@@ -28,6 +28,15 @@ class ManifestTests(unittest.TestCase):
         self.assertNotIn("child_lock", source)
         self.assertNotIn("DeviceManualCtrl", source)
         self.assertNotIn("manual", source.lower().replace("manual_", ""))
+
+    def test_settings_are_persisted_and_clean_modes_are_switches(self) -> None:
+        self.assertTrue((COMPONENT / "storage.py").exists())
+        self.assertFalse((COMPONENT / "button.py").exists())
+        self.assertIn("edge_clean", (COMPONENT / "switch.py").read_text(encoding="utf-8"))
+        self.assertIn(
+            "PERCENTAGE",
+            (COMPONENT / "sensor.py").read_text(encoding="utf-8"),
+        )
 
 
 if __name__ == "__main__":

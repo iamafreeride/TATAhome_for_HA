@@ -29,7 +29,7 @@ Reference material used:
 ### Sensors
 
 - Battery, cleaned area, cleaning time
-- Main brush, side brush, filter and mop-pad remaining days
+- Main brush, side brush, filter and mop-pad life percentage
 - Firmware (diagnostic, disabled by default)
 
 ### Settings
@@ -40,6 +40,14 @@ Reference material used:
 - Voice volume (0–100)
 - Device nickname through `tatahome.set_nickname` service
 - Consumables are read from the vendor's real `0x1113` response
+
+### Settings persistence
+
+The vendor cloud returns factory values after every new login. TATAHome stores
+the user's desired settings in Home Assistant's `.storage` and re-applies them
+after a heartbeat/session drop or a full HA restart. This covers suction,
+water, mode, DND/quiet hours, memory map, breakpoint resume, carpet turbo,
+voice and volume.
 
 ### Device support
 
@@ -105,16 +113,17 @@ data:
 
 - `vacuum.<device>` — main robot
 - `sensor.*_battery`, `sensor.*_cleaned_area`, `sensor.*_cleaning_time`
-- `sensor.*_main_brush_remaining`, `sensor.*_side_brush_remaining`,
-  `sensor.*_filter_remaining`, `sensor.*_mop_pad_remaining`
+- `sensor.*_main_brush_life`, `sensor.*_side_brush_life`,
+  `sensor.*_filter_life`, `sensor.*_mop_pad_life` (percent; `remaining_days`
+  is an attribute)
 - `binary_sensor.*_online`, `binary_sensor.*_docked`
 - `switch.*_do_not_disturb`, `switch.*_memory_map`,
   `switch.*_breakpoint_resume`, `switch.*_carpet_turbo`, `switch.*_voice`
+- `switch.*_edge_clean`, `switch.*_spot_clean`, `switch.*_area_clean`,
+  `switch.*_two_pass_clean` (clean-mode switches; on starts, off pauses)
 - `select.*_suction`, `select.*_water`, `select.*_mode`
 - `number.*_voice_volume`
 - `time.*_do_not_disturb_start`, `time.*_do_not_disturb_end`
-- `button.*_edge_clean`, `button.*_spot_clean`, `button.*_mop_clean`,
-  `button.*_area_clean`, `button.*_two_pass_clean`
 
 ## Known limitations
 

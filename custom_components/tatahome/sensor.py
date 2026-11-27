@@ -34,7 +34,7 @@ def _consumable(index: int) -> Callable[[dict[str, Any]], Any]:
         items = data.get("consumables") or []
         for item in items:
             if str(item.get("key")) == str(index):
-                return item.get("remaining")
+                return item.get("percent")
         return None
 
     return value
@@ -68,8 +68,7 @@ SENSORS: tuple[TATAHomeSensorDescription, ...] = (
     TATAHomeSensorDescription(
         key="main_brush",
         translation_key="main_brush",
-        native_unit_of_measurement=UnitOfTime.DAYS,
-        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:brush",
         value_fn=_consumable(1),
@@ -77,8 +76,7 @@ SENSORS: tuple[TATAHomeSensorDescription, ...] = (
     TATAHomeSensorDescription(
         key="side_brush",
         translation_key="side_brush",
-        native_unit_of_measurement=UnitOfTime.DAYS,
-        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:brush",
         value_fn=_consumable(2),
@@ -86,8 +84,7 @@ SENSORS: tuple[TATAHomeSensorDescription, ...] = (
     TATAHomeSensorDescription(
         key="filter",
         translation_key="filter",
-        native_unit_of_measurement=UnitOfTime.DAYS,
-        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:air-filter",
         value_fn=_consumable(3),
@@ -95,8 +92,7 @@ SENSORS: tuple[TATAHomeSensorDescription, ...] = (
     TATAHomeSensorDescription(
         key="mop_pad",
         translation_key="mop_pad",
-        native_unit_of_measurement=UnitOfTime.DAYS,
-        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:water",
         value_fn=_consumable(4),
@@ -128,6 +124,8 @@ class TATAHomeSensor(TATAHomeEntity, SensorEntity):
 
     entity_description: TATAHomeSensorDescription
 
+    CONSUMABLE_INDEX = {"main_brush": 1, "side_brush": 2, "filter": 3, "mop_pad": 4}
+
     def __init__(self, coordinator, description: TATAHomeSensorDescription) -> None:
         super().__init__(coordinator, f"sensor_{description.key}")
         self.entity_description = description
@@ -138,3 +136,16 @@ class TATAHomeSensor(TATAHomeEntity, SensorEntity):
             return self.entity_description.value_fn(self.coordinator.data)
         except (KeyError, TypeError, ValueError):
             return None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        attrs = super().extra_state_attributes
+        index = self.CONSUMABLE_INDEX.get(self.entity_description.key)
+        if index is None:
+            return attrs
+        for item in self.coordinator.data.get("consumables") or []:
+            if str(item.get("key")) == str(index):
+                attrs["remaining_days"] = item.get("remaining")
+                attrs["display"] = item.get("display")
+                break
+        return attrs
