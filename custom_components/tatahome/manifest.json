@@ -1,0 +1,14 @@
+{
+  "domain": "tatahome",
+  "name": "TATAHome",
+  "codeowners": ["@iamafreeride"],
+  "config_flow": true,
+  "documentation": "https://github.com/iamafreeride/TATAhome_for_HA",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/iamafreeride/TATAhome_for_HA/issues",
+  "loggers": ["custom_components.tatahome"],
+  "quality_scale": "bronze",
+  "requirements": [],
+  "version": "0.1.0"
+}

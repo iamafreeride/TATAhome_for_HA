@@ -1,0 +1,104 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "TATAHome account",
+        "description": "Sign in with the same account used by the TATAHome app.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate TATAHome",
+        "description": "The cloud session expired. Enter the password for {email}.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the TATAHome cloud.",
+      "invalid_auth": "The account or password was rejected."
+    },
+    "abort": {
+      "already_configured": "This TATAHome account is already configured.",
+      "reauth_successful": "Re-authentication succeeded."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "TATAHome options",
+        "data": {
+          "scan_interval": "Polling interval",
+          "heartbeat": "Heartbeat interval"
+        }
+      }
+    }
+  },
+  "services": {
+    "set_nickname": {
+      "name": "Set device nickname",
+      "description": "Change the cloud alias of the robot.",
+      "fields": {
+        "name": {"name": "Name", "description": "New device name."},
+        "config_entry_id": {"name": "Config entry", "description": "Optional TATAHome config entry."}
+      }
+    },
+    "set_quiet_hours": {
+      "name": "Set quiet hours",
+      "description": "Enable or disable do-not-disturb and set its time range.",
+      "fields": {
+        "enabled": {"name": "Enabled"},
+        "start": {"name": "Start", "description": "HH:MM"},
+        "end": {"name": "End", "description": "HH:MM"},
+        "config_entry_id": {"name": "Config entry", "description": "Optional TATAHome config entry."}
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery": {"name": "Battery"},
+      "clean_area": {"name": "Cleaned area"},
+      "clean_time": {"name": "Cleaning time"},
+      "main_brush": {"name": "Main brush remaining"},
+      "side_brush": {"name": "Side brush remaining"},
+      "filter": {"name": "Filter remaining"},
+      "mop_pad": {"name": "Mop pad remaining"},
+      "firmware": {"name": "Firmware"}
+    },
+    "binary_sensor": {
+      "online": {"name": "Online"},
+      "docked": {"name": "Docked"}
+    },
+    "switch": {
+      "do_not_disturb": {"name": "Do not disturb"},
+      "history_map": {"name": "Memory map"},
+      "breakpoint_resume": {"name": "Breakpoint resume"},
+      "carpet_turbo": {"name": "Carpet turbo"},
+      "voice": {"name": "Voice prompts"}
+    },
+    "select": {
+      "suction": {"name": "Suction", "state": {
+        "quiet": "Quiet", "standard": "Standard", "strong": "Strong", "max": "Max"
+      }},
+      "water": {"name": "Water level", "state": {
+        "off": "Off", "low": "Low", "medium": "Medium", "high": "High"
+      }},
+      "mode": {"name": "Default mode", "state": {
+        "auto": "Auto", "spot": "Spot", "edge": "Edge"
+      }}
+    },
+    "number": {
+      "volume": {"name": "Voice volume"}
+    },
+    "button": {
+      "edge_clean": {"name": "Edge clean"},
+      "spot_clean": {"name": "Spot clean"},
+      "mop_clean": {"name": "Mop clean"},
+      "area_clean": {"name": "Area clean"},
+      "two_pass_clean": {"name": "Two-pass clean"}
+    }
+  }
+}

@@ -1,0 +1,48 @@
+set_nickname:
+  name: Set device nickname
+  description: Change the cloud alias of the TATAHome robot.
+  fields:
+    config_entry_id:
+      name: Config entry
+      description: Optional TATAHome config entry ID.
+      example: 01J...
+      selector:
+        config_entry:
+          integration: tatahome
+    name:
+      name: Name
+      description: New device name.
+      required: true
+      example: Living room robot
+      selector:
+        text:
+
+set_quiet_hours:
+  name: Set quiet hours
+  description: Enable or disable do-not-disturb and set its time range.
+  fields:
+    config_entry_id:
+      name: Config entry
+      description: Optional TATAHome config entry ID.
+      selector:
+        config_entry:
+          integration: tatahome
+    enabled:
+      name: Enabled
+      required: true
+      selector:
+        boolean:
+    start:
+      name: Start
+      description: Start time in HH:MM.
+      required: true
+      example: "22:00"
+      selector:
+        text:
+    end:
+      name: End
+      description: End time in HH:MM.
+      required: true
+      example: "07:00"
+      selector:
+        text:

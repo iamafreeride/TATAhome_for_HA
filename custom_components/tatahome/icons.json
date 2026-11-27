@@ -1,0 +1,40 @@
+{
+  "entity": {
+    "sensor": {
+      "battery": {"default": "mdi:battery"},
+      "clean_area": {"default": "mdi:texture-box"},
+      "clean_time": {"default": "mdi:timer-outline"},
+      "main_brush": {"default": "mdi:brush"},
+      "side_brush": {"default": "mdi:brush"},
+      "filter": {"default": "mdi:air-filter"},
+      "mop_pad": {"default": "mdi:water"},
+      "firmware": {"default": "mdi:chip"}
+    },
+    "binary_sensor": {
+      "online": {"default": "mdi:cloud-check"},
+      "docked": {"default": "mdi:home-lightning-bolt"}
+    },
+    "switch": {
+      "do_not_disturb": {"default": "mdi:weather-night"},
+      "history_map": {"default": "mdi:map-marker-path"},
+      "breakpoint_resume": {"default": "mdi:restart"},
+      "carpet_turbo": {"default": "mdi:rug"},
+      "voice": {"default": "mdi:volume-high"}
+    },
+    "select": {
+      "suction": {"default": "mdi:fan"},
+      "water": {"default": "mdi:water"},
+      "mode": {"default": "mdi:robot-vacuum"}
+    },
+    "number": {
+      "volume": {"default": "mdi:volume-high"}
+    },
+    "button": {
+      "edge_clean": {"default": "mdi:border-outside"},
+      "spot_clean": {"default": "mdi:crosshairs"},
+      "mop_clean": {"default": "mdi:water"},
+      "area_clean": {"default": "mdi:selection"},
+      "two_pass_clean": {"default": "mdi:repeat"}
+    }
+  }
+}
