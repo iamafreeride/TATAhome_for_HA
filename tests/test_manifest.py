@@ -14,7 +14,7 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(data["domain"], "tatahome")
         self.assertTrue(data["config_flow"])
         self.assertEqual(data["iot_class"], "cloud_polling")
-        self.assertEqual(data["version"], "0.2.0")
+        self.assertEqual(data["version"], "0.3.0")
 
     def test_translations_are_valid(self) -> None:
         for name in ("strings.json", "translations/en.json", "translations/zh-Hant.json"):
