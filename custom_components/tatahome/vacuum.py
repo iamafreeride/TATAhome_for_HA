@@ -25,6 +25,7 @@ STATE_MAP = {
     "paused": VacuumActivity.PAUSED,
     "returning": VacuumActivity.RETURNING,
     "error": VacuumActivity.ERROR,
+    "idle": VacuumActivity.IDLE,
     "offline": VacuumActivity.IDLE,
 }
 
